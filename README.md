@@ -568,6 +568,30 @@ Medium (~2 ГБ) — буферы `16777216`, `tcp_mem = 262144 524288 786432`. 
 на несколько гигабайт на VPS с 1 ГБ — это прямой путь к OOM.
 
 ```bash
+cat > /etc/sysctl.d/99-vpn-tuning.conf << 'EOF'
+# VPN tuning — VPS ~2 ГБ RAM
+
+net.core.default_qdisc = fq
+net.ipv4.tcp_congestion_control = bbr
+
+net.core.rmem_max = 16777216
+net.core.wmem_max = 16777216
+net.ipv4.tcp_rmem = 4096 262144 16777216
+net.ipv4.tcp_wmem = 4096 262144 16777216
+net.ipv4.tcp_mem  = 262144 524288 786432
+
+net.ipv4.tcp_fastopen = 3
+net.ipv4.tcp_keepalive_time = 120
+net.ipv4.tcp_keepalive_intvl = 30
+net.ipv4.tcp_keepalive_probes = 5
+net.ipv4.tcp_fin_timeout = 15
+net.ipv4.tcp_tw_reuse = 1
+
+net.core.somaxconn = 4096
+net.core.netdev_max_backlog = 4096
+net.ipv4.tcp_max_syn_backlog = 4096
+EOF
+
 sysctl --system
 sysctl net.ipv4.tcp_congestion_control net.core.default_qdisc
 ```
