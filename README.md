@@ -540,9 +540,12 @@ echo tcp_bbr > /etc/modules-load.d/bbr.conf
 free -h   # сначала смотрим объём RAM — профиль подбирается под него
 ```
 
-Small (~1 ГБ RAM, большинство бюджетных VPS) — `/etc/sysctl.d/99-vpn-tuning.conf`:
+Small (~1 ГБ RAM, большинство бюджетных VPS):
 
 ```ini
+cat > /etc/sysctl.d/99-vpn-tuning.conf << 'EOF'
+# VPN tuning — VPS ~1 ГБ RAM
+
 net.core.default_qdisc = fq
 net.ipv4.tcp_congestion_control = bbr
 
@@ -562,6 +565,10 @@ net.ipv4.tcp_tw_reuse = 1
 net.core.somaxconn = 4096
 net.core.netdev_max_backlog = 4096
 net.ipv4.tcp_max_syn_backlog = 4096
+EOF
+
+sysctl --system
+sysctl net.ipv4.tcp_congestion_control net.core.default_qdisc
 ```
 
 Medium (~2 ГБ) — буферы `16777216`, `tcp_mem = 262144 524288 786432`. Не копировать «VPN sysctl»
